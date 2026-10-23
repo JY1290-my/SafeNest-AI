@@ -1,0 +1,16 @@
+-- Replace all placeholders locally. Run in the SQL editor after schema.sql.
+-- Generate UUID and token with the README commands. Never commit a filled copy.
+insert into safenest_private.devices(id, token_hash)
+values ('REPLACE_DEVICE_UUID'::uuid,
+        encode(sha256(convert_to('REPLACE_LONG_RANDOM_DEVICE_TOKEN', 'UTF8')), 'hex'));
+
+-- Optional legacy manual VIEWING binding. For the first manager, install
+-- device_claim.sql and use Camera setup to generate a one-use claim code instead.
+-- This members row alone NEVER grants management rights.
+-- insert into safenest_private.members(device_id, user_id)
+-- values ('REPLACE_DEVICE_UUID'::uuid, 'REPLACE_AUTH_USER_UUID'::uuid);
+
+-- Add another authorized family member with another members row.
+-- Disable a stolen device token / all device access immediately:
+-- update safenest_private.devices set enabled = false where id = 'DEVICE_UUID';
+-- Rotate a token by updating token_hash, then replace laptop .env and restart.

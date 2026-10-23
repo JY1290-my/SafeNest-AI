@@ -1,0 +1,11 @@
+# Both handlers verify credentials themselves before any video action.
+# Required for publishable API keys and the device's custom secret authentication.
+[functions.video-token]
+verify_jwt = false
+[functions.device-video-token]
+verify_jwt = false
+# Config verifies Auth + Home membership. Dispatcher requires a separate server secret.
+[functions.family-push-config]
+verify_jwt = false
+[functions.dispatch-fall-push]
+verify_jwt = false

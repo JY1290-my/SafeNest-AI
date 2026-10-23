@@ -1,0 +1,35 @@
+-- READ ONLY. Run as a project operator in Supabase SQL Editor.
+-- Does NOT invoke the sender, create an alert, or send any notification.
+-- No subscription endpoints, keys, user IDs, Vault values or HTTP headers returned.
+-- These catalog checks work even when optional Push setup is missing.
+select check_name, case when present then 'Present' else 'Missing' end as result
+from (values
+ ('Alert storage',to_regclass('safenest_private.fall_alerts') is not null),
+ ('Push queue',to_regclass('safenest_private.fall_push_jobs') is not null),
+ ('Subscription RPC',to_regprocedure('public.family_push_status(uuid,text)') is not null),
+ ('Queue claim RPC',to_regprocedure('public.claim_fall_push(text)') is not null),
+ ('Queue authorization RPC',to_regprocedure('public.begin_fall_push(uuid,uuid,text)') is not null),
+ ('Queue result RPC',to_regprocedure('public.finish_fall_push(uuid,uuid,text)') is not null),
+ ('Optional background wake function',to_regprocedure('safenest_private.wake_fall_push()') is not null),
+ ('pg_net extension',exists(select 1 from pg_extension where extname='pg_net')),
+ ('pg_cron extension',exists(select 1 from pg_extension where extname='pg_cron')),
+ ('Vault extension',exists(select 1 from pg_extension where extname='supabase_vault'))
+) as checks(check_name,present);
+
+select wanted.name as trigger_name,
+ case when exists(select 1 from pg_trigger t where t.tgrelid=to_regclass(wanted.relation)
+   and t.tgname=wanted.name and not t.tgisinternal and t.tgenabled<>'D')
+ then 'Enabled' else 'Missing or disabled' end as result
+from (values ('capture_fall_alert','safenest_private.camera_snapshots'),
+ ('revoke_family_notifications','safenest_private.members'),
+ ('wake_new_fall_alert','safenest_private.fall_alerts')) as wanted(name,relation);
+
+-- OPTIONAL SEPARATE CHECKS: run ONLY after the corresponding objects above exist.
+-- Uncomment one SELECT at a time. Both are read-only; neither sends anything.
+-- select state,count(*) as jobs,max(expires_at) as latest_expiry
+-- from safenest_private.fall_push_jobs group by state order by state;
+-- select jobname,schedule,active from cron.job where jobname='safenest-fall-push';
+-- Inspect Edge Function deployments/logs separately for family-push-config and
+-- dispatch-fall-push. A database object or scheduled job being present does not
+-- prove Edge deployment, valid secrets, successful sending or phone display.
+-- Do not query/decrypt Vault secrets or expose subscription/pg_net payload rows.

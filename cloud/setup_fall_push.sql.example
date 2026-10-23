@@ -1,0 +1,37 @@
+-- OPTIONAL operator setup AFTER fall_notifications.sql + Edge deployment + secrets.
+-- Do not run until you are ready for real opted-in browser deliveries.
+-- Enable pg_net, pg_cron and Vault using Supabase's supported extensions first.
+-- In the Dashboard Vault UI create TWO server-only secrets (never commit values):
+-- safenest_push_project_url: https://YOUR_PROJECT_REF.supabase.co
+-- safenest_push_dispatch_secret: EXACT SAFENEST_PUSH_DISPATCH_SECRET from the Edge secret.
+-- This file contains no secret, publishable key or device credential.
+begin;
+-- The request queue contains a transient server authorization header.
+revoke all on net.http_request_queue from public,anon,authenticated;
+revoke all on vault.decrypted_secrets from public,anon,authenticated;
+create or replace function safenest_private.wake_fall_push()
+returns void language plpgsql security definer set search_path='' as $$
+declare base text; credential text;
+begin
+ select decrypted_secret into base from vault.decrypted_secrets where name='safenest_push_project_url';
+ select decrypted_secret into credential from vault.decrypted_secrets where name='safenest_push_dispatch_secret';
+ if base is null or base !~ '^https://[a-z0-9]+[.]supabase[.]co$' or length(credential)<32 then return;end if;
+ perform net.http_post(url:=base||'/functions/v1/dispatch-fall-push',
+ headers:=jsonb_build_object('Content-Type','application/json','x-safenest-dispatch-secret',credential),body:='{}'::jsonb,timeout_milliseconds:=60000);
+ exception when others then
+ -- A push wake failure must not roll back detector status/event publication.
+ -- Cron will retry queue processing; no credentials or endpoints are logged.
+ return;
+end; $$;
+revoke all on function safenest_private.wake_fall_push() from public,anon,authenticated;
+create or replace function safenest_private.wake_new_fall_alert()
+returns trigger language plpgsql security definer set search_path='' as $$
+begin perform safenest_private.wake_fall_push();return new;end; $$;
+revoke all on function safenest_private.wake_new_fall_alert() from public,anon,authenticated;
+drop trigger if exists wake_new_fall_alert on safenest_private.fall_alerts;
+create trigger wake_new_fall_alert after insert on safenest_private.fall_alerts for each row execute function safenest_private.wake_new_fall_alert();
+-- Reusing the job name replaces the schedule rather than duplicating it.
+select cron.schedule('safenest-fall-push','* * * * *','select safenest_private.wake_fall_push()');
+commit;
+-- To pause sends: select cron.unschedule('safenest-fall-push');
+-- and drop trigger wake_new_fall_alert on safenest_private.fall_alerts;

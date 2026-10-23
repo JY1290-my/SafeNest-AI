@@ -1,0 +1,27 @@
+-- SUPABASE SQL EDITOR ONLY, after family_management.sql.
+-- New never-assigned devices can instead use local one-use claiming after device_claim.sql.
+-- Keep this operator path for recovery/additional managers; do not clear claim history.
+-- An operator verifies the intended caregiver and device before assigning this role.
+-- Replace BOTH placeholders using your existing device UUID and Auth user's UUID.
+-- Do not put tokens/passwords here. Do not commit a filled private copy.
+begin;
+do $$
+declare device_now uuid:='REPLACE_DEVICE_UUID'; user_now uuid:='REPLACE_AUTH_USER_UUID';
+begin
+  perform 1 from safenest_private.devices where id=device_now and enabled for update;
+  if not found then raise exception 'Configured device unavailable'; end if;
+  if not exists(select 1 from auth.users where id=user_now
+    and (banned_until is null or banned_until<clock_timestamp())) then
+    raise exception 'Caregiver account unavailable';
+  end if;
+  insert into safenest_private.members(device_id,user_id) values(device_now,user_now) on conflict do nothing;
+  insert into safenest_private.device_managers(device_id,user_id) values(device_now,user_now) on conflict do nothing;
+end;
+$$;
+commit;
+-- To remove management authority only (retain viewing), run separately:
+-- delete from safenest_private.device_managers
+-- where device_id='REPLACE_DEVICE_UUID'::uuid and user_id='REPLACE_AUTH_USER_UUID'::uuid;
+-- To revoke all access instead, delete that membership in SQL Editor. This also
+-- removes its manager role, video leases and ALL outstanding invitations for the device.
+-- Keep at least one intended manager, or grant a replacement first.

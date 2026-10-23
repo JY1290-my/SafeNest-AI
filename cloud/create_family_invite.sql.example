@@ -1,0 +1,19 @@
+-- SQL Editor (administrator only), AFTER family_schema.sql.
+-- Replace REPLACE_DEVICE_UUID with the already registered device UUID.
+-- Default: 7 days, up to 5 NEW family members. Copy the code from this result once.
+-- Only its SHA-256 hash is persisted. Do not put this result in source control.
+with new_code as materialized (
+  select replace(gen_random_uuid()::text,'-','') as code
+), created as (
+  insert into safenest_private.family_invites(device_id,code_hash,expires_at,max_uses)
+  select 'REPLACE_DEVICE_UUID'::uuid,encode(sha256(convert_to(code,'UTF8')),'hex'),
+    clock_timestamp()+interval '7 days',5 from new_code
+  returning id,expires_at,max_uses
+)
+select new_code.code as invitation_code,created.id as invite_id,created.expires_at,created.max_uses
+from new_code cross join created;
+
+-- Revoke an unused/partially used invitation:
+-- update safenest_private.family_invites set enabled=false where id='INVITE_UUID'::uuid;
+-- Revoking an invitation does NOT remove existing members. Remove access explicitly:
+-- delete from safenest_private.members where device_id='DEVICE_UUID'::uuid and user_id='USER_UUID'::uuid;
