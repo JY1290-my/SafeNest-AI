@@ -1,0 +1,9 @@
+# Use the existing working virtual environment. Do not replace a working GPU torch build.
+# Original archive supplied an empty requirements file, so these are compatibility ranges.
+ultralytics>=8.3,<9
+opencv-python>=4.10,<5
+Flask>=3.1,<4
+waitress>=3.0,<4
+requests>=2.32,<3
+python-dotenv>=1.0,<2
+livekit==1.1.20

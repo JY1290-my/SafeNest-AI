@@ -1,0 +1,2 @@
+# Added to the existing working Windows environment for remote video.
+livekit==1.1.20

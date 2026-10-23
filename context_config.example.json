@@ -1,0 +1,15 @@
+{
+  "history_seconds": 3.0,
+  "sample_seconds": 0.1,
+  "max_gap_seconds": 0.6,
+  "rest_seconds": 3.0,
+  "recovery_seconds": 1.0,
+  "recline_angle": 60.0,
+  "low_hip_y": 0.72,
+  "low_torso_angle": 35.0,
+  "descent_speed": 0.7,
+  "descent_distance": 0.18,
+  "rotation_speed": 75.0,
+  "stable_speed": 0.2,
+  "stable_rotation": 25.0
+}

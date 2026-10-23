@@ -1,0 +1,22 @@
+{
+  "name": "safenest-video-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test ../tests/status.test.mjs ../tests/video-core.test.mjs ../tests/video-client.test.mjs ../tests/video-database.test.mjs ../tests/family-database.test.mjs ../tests/family-ui.test.mjs ../tests/camera-window.test.mjs ../tests/presence-client.test.mjs ../tests/presence-database.test.mjs ../tests/context-database.test.mjs ../tests/camera-tools.test.mjs ../tests/family-management-database.test.mjs ../tests/family-management-ui.test.mjs ../tests/device-claim-database.test.mjs ../tests/care-note-management-database.test.mjs ../tests/home-identity-database.test.mjs ../tests/multi-camera-database.test.mjs ../tests/home-camera-status.test.mjs ../tests/fall-alert.test.mjs ../tests/fall-notifications-database.test.mjs ../tests/fall-push.test.mjs ../tests/family-notifications-ui.test.mjs",
+    "push:keys": "node ../tools/generate_push_secrets.mjs"
+  },
+  "dependencies": {
+    "@supabase/realtime-js": "2.117.3",
+    "livekit-client": "2.22.4"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.14",
+    "@supabase/supabase-js": "2.117.3",
+    "esbuild": "0.28.2",
+    "jsdom": "26.1.0",
+    "livekit-server-sdk": "2.19.1",
+    "web-push": "3.6.7"
+  }
+}

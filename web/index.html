@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#173d36"><title>SafeNest AI · Home monitoring</title>
+  <link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css"><script src="/config.js"></script>
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+<main>
+  <header><a class="brand" href="/">⌂ <span>SafeNest <b>AI</b></span></a><span id="access-mode" class="pill">FAMILY VIEW · Prototype</span></header>
+  <section id="login" class="card login">
+    <p id="session-loading" class="small muted" role="status" hidden>Restoring sign-in…</p>
+    <div id="auth-content">
+    <p id="auth-eyebrow" class="eyebrow">FAMILY ACCESS</p><h1 id="auth-title">A little closer to home.</h1>
+    <p id="auth-description" class="muted">Sign in or create a family account to view homes shared with you. Your account identifies you as a family member, not a person detected by the camera.</p>
+    <div class="auth-tabs" role="group" aria-label="Account action"><button id="login-tab" type="button" aria-pressed="true">Sign in</button><button id="signup-tab" type="button" class="secondary" aria-pressed="false">Create account</button></div>
+    <form id="login-form">
+      <label id="name-label" hidden>Your name<input id="display-name" maxlength="80" autocomplete="name"></label>
+      <label id="email-label">Email<input id="email" type="email" autocomplete="username"></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+      <button type="button" id="forgot-password" class="text-button">Forgot password?</button>
+      <button type="submit" id="sign-in">Sign in</button>
+    </form><p id="login-message" role="alert"></p><p id="mode-note" class="small muted"></p>
+    </div>
+    <section id="recovery-panel" hidden aria-labelledby="recovery-title">
+      <p class="eyebrow">ACCOUNT RECOVERY</p><h1 id="recovery-title">Forgot password?</h1>
+      <form id="recovery-send-form"><label>Email<input id="recovery-email" type="email" autocomplete="email" required maxlength="254"></label><button id="send-reset-link" type="submit">Send reset link</button></form>
+      <form id="recovery-update-form" hidden><label>New password<input id="reset-new-password" type="password" autocomplete="new-password" minlength="8" required></label><label>Confirm password<input id="reset-confirm-password" type="password" autocomplete="new-password" minlength="8" required></label><button id="update-password" type="submit" disabled>Update password</button></form>
+      <p id="recovery-message" role="status"></p><button id="recovery-request-new" type="button" hidden>Enter email to request another link</button><button id="recovery-back" type="button" class="secondary">Back to sign in</button>
+    </section>
+    <section id="family-panel" class="family-access" hidden>
+      <div class="section-title"><div><p class="eyebrow">YOUR FAMILY ACCOUNT</p><h1 id="family-title" tabindex="-1">Family Dashboard</h1></div><button id="homes-logout" class="secondary compact">Sign out</button></div>
+      <p class="small muted">Choose a home shared with your account. Viewing a camera is optional and starts only when you request it.</p>
+      <form id="profile-form" class="inline-form"><label>Your display name<input id="profile-name" maxlength="80" autocomplete="name" required placeholder="Name shown to your family"></label><button id="save-name" type="submit">Save name</button></form>
+      <p id="profile-message" class="small" role="status"></p>
+      <h2 class="spaced">Followed homes</h2>
+      <p class="small muted">These are your authorized monitoring devices. Your links are saved to your account; an invitation is only needed to add another home.</p>
+      <label class="spaced">Monitoring home / device<select id="device-select" disabled aria-describedby="homes-message"></select></label>
+      <p id="homes-message" class="small" role="status"></p>
+      <div class="home-actions"><button id="open-home" disabled>Open monitoring</button><button id="refresh-homes" class="secondary compact">Refresh list</button></div>
+      <button id="show-invite" type="button" class="secondary" aria-expanded="false" aria-controls="invite-panel">Add a home / device</button>
+      <section id="invite-panel" class="access-panel" aria-labelledby="invite-title" hidden>
+        <div class="section-title"><h3 id="invite-title">Link another home</h3><button id="cancel-invite" type="button" class="secondary compact">Cancel</button></div>
+        <p class="small muted">Enter the invitation from your caregiver. This links an existing monitoring device; it does not register a new camera.</p>
+        <form id="invite-form" class="inline-form"><label>Invitation code<input id="invite-code" required maxlength="128" autocomplete="off" spellcheck="false" placeholder="Code from your caregiver"></label><button id="bind-device" type="submit">Follow home</button></form>
+      </section>
+      <p id="invite-message" class="small" role="status"></p>
+      <p class="small muted">Only homes shared with your account appear here. Ask your administrator or primary caregiver for an invitation.</p>
+      <button id="show-claim" type="button" class="secondary" aria-expanded="false" aria-controls="claim-panel">Set up a monitoring device</button>
+      <section id="claim-panel" class="access-panel" aria-labelledby="claim-title" hidden>
+        <div class="section-title"><h3 id="claim-title">Become this home's device manager</h3><button id="cancel-claim" type="button" class="secondary compact">Cancel</button></div>
+        <ol class="small"><li>On the monitoring computer, open <strong>Start_Camera_Setup.cmd</strong>.</li><li>Check the device and camera settings, then choose <strong>Generate device claim code</strong>.</li><li>Enter that one-use code here within 10 minutes. This account will manage family access for that home.</li></ol>
+        <p class="small muted">For an unclaimed, registered device only. A family invitation grants viewing access; a device claim grants management access. This page does not open, start or configure a physical camera.</p>
+        <form id="claim-form" class="inline-form"><label>Device claim code<input id="claim-code" type="password" required maxlength="64" autocomplete="off" spellcheck="false" placeholder="sn-claim-…"></label><button id="claim-device" type="submit">Become device manager</button></form>
+      </section>
+      <p id="claim-message" class="small" role="status"></p>
+      <details class="setup-help"><summary>About camera setup</summary><p class="small muted">Camera setup runs on the monitoring computer. This webpage cannot register cameras or edit bed areas. Redeeming a valid local device claim code makes your account that home's manager; opening setup alone grants no permissions. Existing managers use Manage family for invitations. No camera on your phone or computer is opened by this page.</p></details>
+    </section>
+  </section>
+  <div id="dashboard" hidden>
+    <div class="section-title"><div><p id="monitor-eyebrow" class="eyebrow">FAMILY DASHBOARD · MONITORING</p><p id="home-code" class="pill home-code">Home ID unavailable</p><h1 id="room">Your home</h1></div><div class="home-actions"><button id="manage-family" class="secondary compact" hidden>Manage family</button><button id="choose-home" class="secondary compact">Choose home</button><button id="logout" class="secondary compact">Sign out</button></div></div>
+    <div id="monitor-content" hidden>
+    <details id="local-setup-panel" class="card setup-help" hidden><summary>Camera setup on the monitoring computer</summary><p>Use <strong>Camera setup [C]</strong> in the existing live monitoring window to mark the bed. Use <strong>Confirm [B / Enter]</strong> to confirm an unchanged view, or <strong>Reset [R]</strong> after moving the camera.</p><p class="small muted">To select a camera or change its labels, stop monitoring with Q and open <strong>Start_Camera_Setup.cmd</strong> in the project folder on that computer. Use <strong>Preview &amp; calibrate</strong>, close preview, then <strong>Start monitoring</strong>. Setup preview does not run AI monitoring. This page only displays the existing camera feed; it does not start or configure a camera.</p><p class="small muted">Device registration still requires local configuration. For an unclaimed registered device, generate a claim code in Camera setup, then redeem it on the family website. Existing managers invite relatives through Manage family. Local password access is separate from a Supabase family account.</p></details>
+    <p id="demo-banner" class="demo" hidden>DEMO · Simulated status. No real camera or cloud updates.</p>
+    <section id="status-card" class="card status tone-offline" aria-labelledby="status-label">
+      <p id="status-scope" class="eyebrow">CURRENT CAMERA OBSERVATION</p>
+      <div class="status-heading"><span class="status-dot" aria-hidden="true"></span><span id="status-label" role="status" aria-live="polite" aria-atomic="true">Connecting</span></div>
+      <p id="status-description">Waiting for the latest update.</p>
+      <div class="status-footer"><span id="connection">Connection pending</span><span id="age">—</span></div>
+    </section>
+    <section class="details"><div><span class="eyebrow">CAMERA</span><strong id="camera-name">—</strong><span id="camera-state">Unknown</span></div><div><span class="eyebrow">LATEST OBSERVATION</span><strong id="updated">—</strong><span id="cloud-state">—</span></div></section>
+    <section id="home-camera-panel" hidden aria-labelledby="home-cameras-title">
+      <div id="home-summary" class="card status"><p class="eyebrow">HOME SUMMARY · ALL EXPECTED CAMERAS</p><h2 id="home-status-label">Monitoring unavailable</h2><p id="home-status-description"></p></div>
+      <div class="card"><h2 id="home-cameras-title">Cameras in this Home</h2><p id="camera-list-message" role="status"></p><ul id="camera-list" class="camera-list"></ul></div>
+    </section>
+    <div id="monitor-workspace" class="monitor-workspace">
+      <div class="camera-column">
+    <section id="fall-alert" class="card fall-alert" aria-labelledby="fall-alert-title" hidden>
+      <p class="eyebrow">CURRENT DETECTION · CHECK THE SITUATION</p>
+      <h2 id="fall-alert-title">Suspected Fall — Please check</h2>
+      <p id="fall-alert-home" class="alert-location"></p>
+      <ul id="fall-alert-list" class="fall-alert-list"></ul>
+      <p class="small">This is a current observation, not confirmation of injury or a prediction. Person numbers are temporary labels within one camera session, not identities.</p>
+      <p class="small">Acknowledge records that you viewed the server alert and shares your display name and time with this Home’s family. It does not confirm recovery, change AI status or history, or silence the monitoring computer’s alert.</p>
+    </section>
+    <p id="fall-alert-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+    <section class="card camera-card">
+      <div class="section-title camera-heading"><h2>Camera view</h2><div id="presence-entry" hidden><button id="presence-toggle" type="button" class="secondary family-presence-button" aria-expanded="false" aria-controls="presence-panel" aria-describedby="presence-message"><span aria-hidden="true">♧</span><span id="presence-count">Family · …</span><span id="presence-short-name" class="presence-short-name"></span><span id="presence-more"></span></button></div><span class="pill">On demand</span></div>
+      <section id="presence-panel" class="presence-popover" aria-labelledby="presence-title" hidden><div class="section-title"><h3 id="presence-title">Family online</h3><button id="close-presence" type="button" class="secondary compact">Close</button></div><p id="presence-message" class="small" role="status">Checking family connections…</p><ul id="online-members" class="online-members"></ul><p class="small muted">Recently connected to this home's webpage. Online status does not confirm someone is watching the camera or available to respond.</p></section>
+      <div id="camera-slot"><div id="camera-stage" class="camera-stage">
+        <div id="mini-toolbar" class="mini-toolbar" tabindex="0" aria-label="Move camera mini-player with arrow keys; Escape returns to page" hidden><strong>Camera mini-player</strong><button id="mini-close" type="button" class="secondary compact" aria-label="Close mini-player and return video to page">Return to page</button></div>
+        <div class="camera-view"><span id="video-state-badge" class="live-badge" hidden>● Live</span>
+          <button id="camera-pip" type="button" class="pip-toggle" aria-label="Toggle camera Picture-in-Picture" aria-pressed="false" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M13 12h7v6h-7z"/></svg><span>Picture-in-Picture</span></button>
+          <video id="camera-video" autoplay playsinline muted hidden></video><img id="camera-image" alt="Current annotated frame from the laptop camera" hidden><div id="camera-placeholder"><span class="camera-icon">▣</span><strong id="stream-state">Camera stream not connected</strong><p id="stream-description">Video is separate from status updates.</p></div></div>
+      </div></div>
+      <p id="pip-message" class="small muted" role="status"></p>
+      <button id="view-camera" class="secondary" disabled>View camera</button>
+      <p id="capture-scope" class="small muted">Current camera unavailable</p>
+      <p id="recording-indicator" class="recording" role="status" hidden>● Recording · Keep this page visible</p>
+      <div class="camera-actions" role="group" aria-label="Camera and monitoring tools">
+        <button id="record-video" class="secondary" type="button" aria-pressed="false" aria-describedby="capture-help" disabled>Record</button>
+        <button id="capture-frame" class="secondary" type="button" aria-label="Camera: save a screenshot" aria-describedby="capture-help" disabled><span aria-hidden="true">▧</span> Camera</button>
+        <button id="open-replay" class="secondary" type="button" aria-controls="replay-panel"><span aria-hidden="true">▷</span> Replay</button>
+        <button id="open-settings" class="secondary" type="button" aria-controls="settings-panel" aria-haspopup="dialog" aria-expanded="false"><span aria-hidden="true">⚙</span> Settings</button>
+      </div>
+      <p id="capture-help" class="small muted">Connect the camera to take a screenshot or record.</p>
+      <p id="media-message" class="small" role="status"></p>
+      <a id="snapshot-download" class="download-link" hidden>Download screenshot</a>
+      <p class="small muted">Private viewing · Screenshots and manual recordings are not uploaded. Download them to keep them.</p>
+      <details class="legend"><summary>Status &amp; pose guide</summary>
+        <ul class="status-legend">
+          <li><strong class="legend-normal">✓ Normal</strong><span>No fall condition detected.</span></li>
+          <li><strong class="legend-warning">◷ Checking / Pose Unclear</strong><span>Posture is being assessed or cannot be assessed.</span></li>
+          <li><strong class="legend-danger">! Suspected Fall</strong><span>Check the person. This is not a confirmed emergency.</span></li>
+          <li><strong>— Tracking Lost / No Person</strong><span>Monitoring cannot confirm the person's condition.</span></li>
+          <li><strong>◷ Check Person / Resting in Bed</strong><span>Context observation; monitoring continues.</span></li>
+        </ul>
+        <p class="small muted">Skeletons and temporary Person labels come from the laptop. Skeleton joint colors are not risk levels. Person status text is green for Normal, red for Suspected Fall and amber for other observations. Labels are not identities.</p>
+      </details>
+    </section>
+      <button id="notes-toggle" type="button" class="secondary mobile-only" aria-expanded="false" aria-controls="notes-panel">Care notes</button>
+      </div>
+    <section id="notes-panel" class="card" hidden>
+      <div class="section-title"><h2 id="notes-title" tabindex="-1">Shared care notes</h2><div class="home-actions"><span class="pill">Latest 30</span><button id="close-notes" type="button" class="secondary compact mobile-only">Close</button></div></div>
+      <p class="small muted">Observations, care suggestions and false-alarm explanations shared with this home's family. Notes do not change AI status and are not emergency alerts or medical diagnoses.</p>
+      <p id="notes-message" class="small" role="status"></p><ol id="notes" class="notes"></ol>
+      <section id="note-delete-confirm" class="access-panel" role="group" aria-labelledby="note-delete-title" aria-describedby="note-delete-help" hidden>
+        <h3 id="note-delete-title">Delete this care note?</h3>
+        <p id="note-delete-help" class="small">This permanently removes the note from this home's shared care notes. This cannot be undone. AI status, detection events and local alerts will not change.</p>
+        <p id="note-delete-preview" class="note-preview"></p>
+        <div class="home-actions"><button id="cancel-note-delete" type="button" class="secondary">Cancel</button><button id="confirm-note-delete" type="button">Delete note</button></div>
+      </section>
+      <p id="note-delete-message" class="small" role="status"></p>
+      <p class="small muted">You can delete your own notes. Device managers can also remove notes for this home. Display names are chosen by family members, not verified identities.</p>
+      <form id="note-form"><label for="note-body">Add a care note</label><textarea id="note-body" rows="4" maxlength="1000" required placeholder="Share an observation with the family…"></textarea><p class="small muted">1–1,000 characters · Up to 5 notes per minute per account.</p><button id="post-note" type="submit">Post note</button></form>
+      <p id="note-message" class="small" role="status"></p>
+    </section>    </div>
+    <section id="family-alert-panel" class="card" hidden aria-labelledby="family-alert-title">
+      <div class="section-title"><h2 id="family-alert-title">Family safety alerts</h2><button id="refresh-alerts" type="button" class="secondary compact">Refresh alerts</button></div>
+      <p id="family-alert-scope" class="small"></p><p id="family-alert-count" class="pill"></p>
+      <p id="family-alert-message" class="small" role="status"></p><p id="family-alert-action" class="small" role="status"></p>
+      <ol id="family-alert-list" class="notes family-alerts"></ol>
+      <p class="small muted">Suspected-fall observations are not confirmation of injury. Acknowledge only records that a family member viewed the alert; it is not a recovery or emergency-response confirmation. Person numbers are temporary labels.</p>
+      <p id="alert-push-summary" class="small" role="status"></p><a href="#push-settings" id="alert-notification-settings">Browser notification settings</a>
+    </section>
+    <section id="replay-panel" class="card" tabindex="-1" aria-labelledby="replay-title"><p class="eyebrow">RECORDED EVENTS &amp; LOCAL CLIPS</p><div class="section-title"><h2 id="replay-title">Recent events</h2><span class="pill">Latest 10</span></div><p id="event-scope" class="small muted"></p><p class="small muted">Recorded detection transitions, not the current camera state or a prediction. Times come from each monitoring computer’s clock; new events include a time-zone offset.</p><ol id="events" class="events"><li>No events received.</li></ol>
+      <h3>Local clips</h3><p class="small muted">Manual recordings from this page session, not automatically matched to events. No cloud video archive is available.</p>
+      <p id="no-clips" class="empty-state">No video clips saved in this session. Events contain time, status and details only.</p>
+      <ul id="local-clips" class="local-clips"></ul>
+      <p class="small muted">Download clips to keep them. This page retains up to 3 clips / 64 MiB in memory; refreshing, switching Home or Camera, or signing out clears them. Previously downloaded files can be opened in your device's video player.</p>
+    </section>
+    <dialog id="settings-panel" class="card settings-dialog" role="dialog" tabindex="-1" aria-labelledby="settings-title" aria-describedby="settings-scope" hidden>
+      <div class="section-title"><h2 id="settings-title">Camera settings &amp; privacy</h2><button id="close-settings" type="button" class="secondary compact">Close</button></div>
+      <p id="settings-scope" class="small">Current camera unavailable</p>
+      <label class="preference"><input id="large-text" type="checkbox"> Larger text for this session</label>
+      <h3 id="account-settings-title">Account &amp; home</h3><p id="account-settings-help">Use Choose home to return to Family Dashboard, switch monitoring devices or edit your display name. Choose Add a home / device only when linking another home. Access is checked against your account.</p>
+      <section id="push-settings" hidden aria-labelledby="push-title"><h3 id="push-title" tabindex="-1">Browser notifications</h3>
+      <p>Opt in for this Home in this browser. Push notifications use a generic message; open the signed-in website to review. Delivery depends on your browser, network and system settings.</p>
+      <p id="push-status" role="status" class="small"></p><dl id="push-checks" class="push-checks"></dl><div class="home-actions"><button id="enable-push" type="button" class="secondary" hidden>Enable browser notifications</button><button id="disable-push" type="button" class="secondary" hidden>Disable for this Home</button><button id="refresh-push" type="button" class="secondary">Check notification setup</button></div>
+      <p class="small">Enable on each phone or browser that should receive alerts. Only new alerts created after subscribing are eligible. An alert shown here or marked as viewed does not prove a push notification reached a phone. If alerts do not arrive, ask the Home manager to check notification setup.</p>
+      <p class="small muted">Closing the page keeps opted-in push enabled. Signing out disables this browser subscription. Other browsers and other Home preferences are managed separately. No email, SMS or calls are sent.</p></section>
+      <h3>Camera calibration</h3><p>On the monitoring laptop, use Camera setup [C] in the live monitoring window. After moving or rotating the camera, invalidate the old view with R and recalibrate. Only confirm an unchanged view with B / Enter. Calibration cannot be changed remotely here.</p>
+      <h3>PTZ unavailable</h3><p>This project has no authorized pan, tilt or zoom control interface. This camera cannot be moved from this page.</p>
+      <h3>AI prediction unavailable</h3><p>No validated prediction model is configured. Current observations do not predict when a fall will occur and are not medical diagnoses.</p>
+      <section class="storage-section" aria-labelledby="storage-title">
+        <h3 id="storage-title">Storage &amp; downloads</h3><p id="storage-scope" class="storage-scope">Current camera unavailable</p>
+        <h4>Media held by this page</h4><p class="small muted">Actual encoded media blobs in this page session. These values are not your device’s disk capacity, total browser memory, or cloud storage usage.</p>
+        <dl class="storage-usage"><div><dt>Screenshot ready to download</dt><dd id="storage-screenshot">0 B</dd></div><div><dt>Completed clips</dt><dd id="storage-clips">0 clips · 0 B</dd></div><div><dt>Recording chunks</dt><dd id="storage-recording">Not recording · 0 B</dd></div><div><dt>Total retained media</dt><dd id="storage-total">0 B</dd></div></dl>
+        <dl class="storage-locations">
+          <div><dt>Screenshots &amp; manual recordings</dt><dd>Created only when you click Camera or Record. Nothing is uploaded. Use the download links to save files to your browser’s chosen location; this page cannot verify a completed download or inspect your saved files or free disk space.</dd></div>
+          <div><dt>Temporary recordings</dt><dd>Video only · Up to 5 minutes or 64 MiB per recording. Replay keeps at most 3 clips / 64 MiB in this page’s memory. A disconnect or hidden page stops recording. Switching Home or Camera, refreshing, or signing out clears temporary media; downloaded files remain on your device.</dd></div>
+          <div><dt>Cloud data</dt><dd>For connected cloud Homes, Supabase stores authorized status, event metadata and shared care notes. These records are separate from video files. This page has no cloud video archive or cloud capacity meter.</dd></div>
+          <div><dt>Monitoring-computer files</dt><dd>Detection logs, camera settings and per-camera calibration stay on the relevant monitoring computer. No raw calibration background images are uploaded. Manage physical-camera setup locally; this webpage cannot inspect or clear that computer’s disk.</dd></div>
+        </dl>
+        <h4>Unavailable in this version</h4><p>No cloud video recording, microSD management or quick voice commands are configured. No storage-formatting, remote disk-cleanup or automatic emergency-call controls are provided.</p>
+      </section>
+    </dialog>
+    <section id="context-panel" class="card" hidden><h2>People in view</h2><p id="calibration-state" class="small" role="status"></p><ul id="person-context" class="notes"></ul><p id="context-counts" class="small muted"></p><p class="small muted">Person numbers are temporary tracking labels, not identities. Bed areas are marked and confirmed on the laptop after moving the camera.</p></section>
+
+
+    </div>
+    <footer>SafeNest AI · Home safety prototype<br>Monitoring states are observations, not confirmation of injury.</footer>
+  </div>
+</main>
+    <dialog id="management-panel" class="card management-dialog" role="dialog" tabindex="-1" aria-labelledby="management-title" hidden>
+      <div class="section-title"><div><h2 id="management-title">Family access</h2><p id="management-home" class="small"></p></div><button id="close-management" type="button" class="secondary compact">Close</button></div>
+      <p class="small muted">Device managers can invite or remove family members for this home. Names are self-chosen labels; confirm the intended person before removing access. This does not manage the physical camera.</p>
+      <button id="refresh-management" type="button" class="secondary compact">Refresh family access</button>
+      <p id="management-message" role="status"></p>
+      <h3>Authorized family members</h3><ul id="managed-members" class="management-list"></ul>
+      <div id="family-action-confirm" class="access-panel" hidden><p id="family-action-description"></p><div class="home-actions"><button id="confirm-family-action" type="button">Confirm revocation</button><button id="cancel-family-action" type="button" class="secondary">Cancel</button></div></div>
+      <h3>Create invitation</h3>
+      <form id="create-invite-form" class="inline-form"><label>Expires in hours<input id="invite-hours" type="number" min="1" max="720" step="1" value="168" required></label><label>Maximum new members<input id="invite-uses" type="number" min="1" max="100" step="1" value="5" required></label><button id="create-family-invite" type="submit">Create invitation</button></form>
+      <p class="small muted">Default: 7 days and 5 new family members. Share the code privately after creation. Existing members do not need another invitation.</p>
+      <p id="create-invite-message" role="status"></p>
+      <div id="created-code-panel" class="access-panel" hidden><label>Invitation code · shown once<input id="created-invite-code" readonly autocomplete="off" spellcheck="false"></label><div class="home-actions"><button id="copy-created-code" type="button">Copy code</button><button id="dismiss-created-code" type="button" class="secondary">Hide code</button></div><p id="created-code-message" role="status"></p><p class="small muted">Closing this panel, switching homes or leaving the page clears this code. The database stores only its hash.</p></div>
+      <section id="camera-management" hidden><h3>Linked cameras &amp; monitoring computers</h3>
+        <p class="small muted">Connect another registered, unclaimed monitoring computer to this Home. Select and calibrate its physical camera locally. This does not remotely open or configure a camera.</p>
+        <button id="create-camera-code" type="button">Generate camera setup code</button>
+        <div id="camera-code-panel" class="access-panel" hidden><label>Camera setup code · shown once<input id="camera-setup-code" readonly autocomplete="off" spellcheck="false"></label><button id="hide-camera-code" type="button" class="secondary">Hide code</button><p class="small muted">Single use · Expires within 10 minutes. Enter it in Camera setup on the additional computer.</p></div>
+        <p id="camera-management-message" role="status"></p><h4>Camera setup codes</h4><ul id="camera-setup-codes" class="management-list"></ul>
+        <h4>Expected cameras</h4><p class="small muted">Disabling a retired camera excludes it from the Home summary and blocks remote video. It does not stop the physical detector or delete history.</p><ul id="managed-cameras" class="management-list"></ul>
+      </section>
+      <h3>Invitations</h3><ul id="managed-invites" class="management-list"></ul>
+    </dialog>
+
+</body></html>
